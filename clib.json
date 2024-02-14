@@ -1,0 +1,17 @@
+{
+    "name": "bit_array",
+    "version": "0.0.0",
+    "repo": "goodcleanfun/bit_array",
+    "description": "Dynamic bit array",
+    "keywords": ["array", "bit"],
+    "license": "MIT",
+    "development": {
+      "silentbicycle/greatest": "*"
+    },
+    "dependencies": {
+      "goodcleanfun/array": "*"
+    },
+    "src": [
+      "src/bit_array.h"
+    ]
+  }
