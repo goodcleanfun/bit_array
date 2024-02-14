@@ -63,6 +63,7 @@ TEST test_bit_array(void) {
     ASSERT_EQ(v->n, 239);
 
     bit_array_flip_all(v);
+    ASSERT_EQ(bit_array_get(v, 0), 1);
     ASSERT_EQ(bit_array_get(v, 238), 0);
 
     current_cap = v->m;

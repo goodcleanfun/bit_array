@@ -18,8 +18,10 @@
 
 typedef bit_array_impl bit_array;
 
+#define BYTES_SIZE(n) ((n) / BITS + ((n) % BITS != 0))
+
 static inline bit_array *bit_array_new_size(size_t size) {
-    return bit_array_impl_new_size(size / BITS + (size % BITS != 0));
+    return bit_array_impl_new_size(BYTES_SIZE(size));
 }
 
 static inline bit_array *bit_array_new(void) {
@@ -27,31 +29,31 @@ static inline bit_array *bit_array_new(void) {
 }
 
 static inline bit_array *bit_array_new_size_fixed(size_t size) {
-    return bit_array_impl_new_size_fixed(size / BITS);
+    return bit_array_impl_new_size_fixed(BYTES_SIZE(size));
 }
 
 static inline bit_array *bit_array_new_aligned(size_t size, size_t alignment) {
-    return bit_array_impl_new_aligned(size / BITS, alignment);
+    return bit_array_impl_new_aligned(BYTES_SIZE(size), alignment);
 }
 
 static inline bool bit_array_resize(bit_array *array, size_t size) {
-    return bit_array_impl_resize(array, size / BITS);
+    return bit_array_impl_resize(array, BYTES_SIZE(size));
 }
 
 static inline bool bit_array_resize_to_fit(bit_array *array, size_t needed_capacity) {
-    return bit_array_impl_resize_to_fit(array, needed_capacity / BITS);
+    return bit_array_impl_resize_to_fit(array, BYTES_SIZE(needed_capacity));
 }
 
 static inline bool bit_array_resize_aligned(bit_array *array, size_t size, size_t alignment) {
-    return bit_array_impl_resize_aligned(array, size / BITS, alignment);
+    return bit_array_impl_resize_aligned(array, BYTES_SIZE(size), alignment);
 }
 
 static inline bool bit_array_resize_fixed(bit_array *array, size_t size) {
-    return bit_array_impl_resize_fixed(array, size / BITS);
+    return bit_array_impl_resize_fixed(array, BYTES_SIZE(size));
 }
 
 static inline bool bit_array_resize_fixed_aligned(bit_array *array, size_t size, size_t alignment) {
-    return bit_array_impl_resize_fixed_aligned(array, size / BITS, alignment);
+    return bit_array_impl_resize_fixed_aligned(array, BYTES_SIZE(size), alignment);
 }
 
 
@@ -72,7 +74,7 @@ static inline bool bit_array_set(bit_array *array, size_t index, bool value) {
 }
 
 static inline bool bit_array_push(bit_array *array, bool value) {
-    if ((array->n / BITS) == array->m) {
+    if (BYTES_SIZE(array->n + 1) > array->m) {
         if (!bit_array_resize_to_fit(array, array->n + 1)) return false;
     }
     if (value) {
@@ -116,7 +118,7 @@ static inline void bit_array_clear(bit_array *array) {
 }
 
 static inline bool bit_array_copy(bit_array *dst, bit_array *src, size_t n) {
-    size_t copy_size = n / BITS + (n % BITS != 0);
+    size_t copy_size = BYTES_SIZE(n);
     return bit_array_impl_copy(dst, src, copy_size);
 }
 static inline bit_array *bit_array_new_copy(bit_array *array, size_t n) {
@@ -128,9 +130,9 @@ static inline bit_array *bit_array_new_copy(bit_array *array, size_t n) {
 static inline bit_array *bit_array_new_ones(size_t n) {
     bit_array *array = bit_array_new_size(n);
     if (array == NULL) return NULL;
-    memset(array->a, 0xFF, n / BITS);
+    memset(array->a, 0xFF, BYTES_SIZE(n));
     if (n % BITS != 0) {
-        array->a[n / BITS] = 0xFF & ~(1 << ((BITS - (n % BITS)) - 1));
+        array->a[n / BITS] = 0xFF & ~(1 << ((BITS - 1 - (n % BITS))));
     }
     array->n = n;
     return array;
@@ -139,7 +141,7 @@ static inline bit_array *bit_array_new_ones(size_t n) {
 static inline bit_array *bit_array_new_zeros(size_t n) {
     bit_array *array = bit_array_new_size(n);
     if (array == NULL) return NULL;
-    memset(array->a, 0, n / BITS + (n % BITS != 0));
+    memset(array->a, 0, BYTES_SIZE(n));
     array->n = n;
     return array;
 }
@@ -155,9 +157,9 @@ static inline bit_array *bit_array_new_value(size_t n, bool value) {
 static inline void bit_array_set_all(bit_array *array, bool value) {
     if (value) {
         memset(array->a, 0xFF, array->n / BITS);
-        array->a[array->n / BITS] &= ~(1 << ((BITS - (array->n % BITS)) - 1));
+        array->a[array->n / BITS] &= ~(1 << ((BITS - 1 - (array->n % BITS))));
     } else {
-        memset(array->a, 0, array->n / BITS + (array->n % BITS != 0));
+        memset(array->a, 0, BYTES_SIZE(array->n));
     }
 }
 
@@ -166,7 +168,7 @@ static inline void bit_array_flip(bit_array *array, size_t index) {
 }
 
 static inline void bit_array_flip_all(bit_array *array) {
-    for (size_t i = 0; i < array->n; i++) {
+    for (size_t i = 0; i < BYTES_SIZE(array->n); i++) {
         array->a[i] = ~array->a[i];
     }
     if (array->n % BITS != 0) {
@@ -181,5 +183,8 @@ static inline void bit_array_destroy(bit_array *array) {
 static inline void bit_array_destroy_aligned(bit_array *array) {
     bit_array_impl_destroy_aligned(array);
 }
+
+#undef BYTES_SIZE
+#undef BITS
 
 #endif // BIT_ARRAY_H
