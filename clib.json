@@ -9,9 +9,11 @@
       "silentbicycle/greatest": "*"
     },
     "dependencies": {
+      "goodcleanfun/aligned": "*",
       "goodcleanfun/array": "*"
     },
     "src": [
-      "src/bit_array.h"
+      "src/bit_array.h",
+      "src/bit_array_aligned.h"
     ]
-  }
+}
