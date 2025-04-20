@@ -11,19 +11,7 @@
 #define BIT_ARRAY_CONCAT_(a, b) a ## b
 #define BIT_ARRAY_CONCAT(a, b) BIT_ARRAY_CONCAT_(a, b)
 #define BIT_ARRAY_FUNC(name) BIT_ARRAY_CONCAT(BIT_ARRAY_NAME, _##name)
-#define BIT_ARRAY_IMPL BIT_ARRAY_CONCAT(BIT_ARRAY_NAME, _impl)
 #define BIT_ARRAY_IMPL_FUNC(name) BIT_ARRAY_CONCAT(BIT_ARRAY_IMPL, _##name)
-
-// Included once per new array type
-#define ARRAY_NAME BIT_ARRAY_IMPL
-#define ARRAY_TYPE unsigned char
-#ifndef BIT_ARRAY_ALIGNED
-#include "array/array.h"
-#else
-#include "aligned/aligned_array.h"
-#endif
-#undef ARRAY_TYPE
-#undef ARRAY_NAME
 
 typedef BIT_ARRAY_IMPL BIT_ARRAY_NAME;
 

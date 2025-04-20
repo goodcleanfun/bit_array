@@ -2,7 +2,7 @@
 #include "greatest/greatest.h"
 
 #define DEFAULT_ARRAY_SIZE 8
-#include "bit_array.h"
+#include "bit_array/bit_array.h"
 
 TEST test_bit_array(void) {
     bit_array *v = bit_array_new();
